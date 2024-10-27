@@ -8,6 +8,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+// Custom modules
+#include "common/stopwatch.hpp"
+#include "shaders/master.hpp"
+using namespace kc;
+
 static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -43,6 +48,54 @@ static void Run()
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 
+    Shaders::Master leftShaderMaster, rightShaderMaster;
+    try
+    {
+        Stopwatch stopwatch;
+        leftShaderMaster.compile({ 255, 0, 0 });
+        rightShaderMaster.compile({ 255, 255, 0 });
+        fmt::print("Shaders compiled in {} ms\n", stopwatch.milliseconds());
+    }
+    catch (const std::runtime_error&)
+    {
+        glfwTerminate();
+        throw;
+    }
+
+    constexpr float LeftVertices[] = {
+        -0.5f - 0.3f, -0.5f, 0.0f,
+        0.0f - 0.3f, 0.5f, 0.0f,
+        0.5f - 0.3f, -0.5f, 0.0f,
+    };
+
+    unsigned int leftVertexArrayObject;
+    glGenVertexArrays(1, &leftVertexArrayObject);
+    glBindVertexArray(leftVertexArrayObject);
+
+    unsigned int leftVertexBufferObject;
+    glGenBuffers(1, &leftVertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, leftVertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(LeftVertices), LeftVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
+    glEnableVertexAttribArray(0);
+
+    constexpr float RightVertices[] = {
+        -0.5f + 0.3f, 0.5f, 0.0f,
+        0.0f + 0.3f, -0.5f, 0.0f,
+        0.5f + 0.3f, 0.5f, 0.0f,
+    };
+
+    unsigned int rightVertexArrayObject;
+    glGenVertexArrays(1, &rightVertexArrayObject);
+    glBindVertexArray(rightVertexArrayObject);
+
+    unsigned int rightVertexBufferObject;
+    glGenBuffers(1, &rightVertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, rightVertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(RightVertices), RightVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
+    glEnableVertexAttribArray(0);
+    
     while (!glfwWindowShouldClose(window))
     {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -50,6 +103,14 @@ static void Run()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        leftShaderMaster.use();
+        glBindVertexArray(leftVertexArrayObject);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        rightShaderMaster.use();
+        glBindVertexArray(rightVertexArrayObject);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
