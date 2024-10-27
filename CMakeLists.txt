@@ -16,8 +16,8 @@ find_package(OpenGL REQUIRED)
 
 ## --- Executable configuration --- ##
 add_executable(LearnOpenGL "source/main.cpp"
-    # Shaders modules
-    "source/shaders/master.cpp"
+    # Graphics modules
+    "source/graphics/shader_program.cpp"
 )
 target_link_libraries(LearnOpenGL PRIVATE
     fmt::fmt
