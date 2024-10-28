@@ -16,8 +16,16 @@ find_package(OpenGL REQUIRED)
 
 ## --- Executable configuration --- ##
 add_executable(LearnOpenGL "source/main.cpp"
+    # Common modules
+    "source/common/image.cpp"
+    "source/common/utility.cpp"
+
+    # External modules
+    "source/external/stb_image.c"
+
     # Graphics modules
     "source/graphics/shader_program.cpp"
+    "source/graphics/texture.cpp"
 )
 target_link_libraries(LearnOpenGL PRIVATE
     fmt::fmt

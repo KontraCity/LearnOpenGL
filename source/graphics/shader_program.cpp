@@ -108,4 +108,27 @@ void Graphics::ShaderProgram::make(const std::string& vertexShaderFilePath, cons
     free(false);
 }
 
+void Graphics::ShaderProgram::use() const
+{
+    glUseProgram(m_shaderProgram);
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, bool value)
+{
+    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
+    glUniform1i(location, static_cast<int>(value));
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, int value)
+{
+    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
+    glUniform1i(location, value);
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, float value)
+{
+    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
+    glUniform1f(location, value);
+}
+
 } // namespace kc

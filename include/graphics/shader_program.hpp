@@ -65,10 +65,22 @@ namespace Graphics
         void make(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath);
 
         /// @brief Tell OpenGL to use this shader program
-        inline void use() const
-        {
-            glUseProgram(m_shaderProgram);
-        }
+        void use() const;
+
+        /// @brief Set uniform variable
+        /// @param name Variable name
+        /// @param value The value to set
+        void set(const std::string& name, bool value);
+
+        /// @brief Set uniform variable
+        /// @param name Variable name
+        /// @param value The value to set
+        void set(const std::string& name, int value);
+
+        /// @brief Set uniform variable
+        /// @param name Variable name
+        /// @param value The value to set
+        void set(const std::string& name, float value);
     };
 }
 

@@ -10,9 +10,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+// External modules
+#include "external/stb_image.h"
+
 // Custom modules
 #include "common/stopwatch.hpp"
+#include "common/utility.hpp"
 #include "graphics/shader_program.hpp"
+#include "graphics/texture.hpp"
 using namespace kc;
 
 static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -54,20 +59,42 @@ static void Run()
     try
     {
         Stopwatch stopwatch;
-        shaderProgram.make("../../shaders/shader.vert", "../../shaders/shader.frag");
-        fmt::print("Shader program made in {} ms\n", stopwatch.milliseconds());
+        shaderProgram.make("../../resources/shaders/shader.vert", "../../resources/shaders/shader.frag");
+        fmt::print("Shader program built in {} ms\n", stopwatch.milliseconds());
     }
-    catch (const std::runtime_error&)
+    catch (...)
     {
         glfwTerminate();
         throw;
     }
     shaderProgram.use();
 
+    Graphics::Texture containerTexture, awesomeFaceTexture;
+    try
+    {
+        Stopwatch stopwatch;
+        containerTexture.load("../../resources/textures/container.jpg");
+        awesomeFaceTexture.load("../../resources/textures/awesomeface.png", GL_RGBA, true);
+        fmt::print("Textures loaded in {} ms\n", stopwatch.milliseconds());
+    }
+    catch (...)
+    {
+        glfwTerminate();
+        throw;
+    }
+    shaderProgram.set("ContainerTexture", 0);
+    shaderProgram.set("AwesomeFaceTexture", 1);
+
     constexpr float Vertices[] = {
-        -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
-         0.0f,  0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+         0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+    };
+
+    constexpr int Indices[] = {
+        0, 1, 2,
+        0, 2, 3,
     };
 
     unsigned int vertexArrayObject;
@@ -78,21 +105,38 @@ static void Run()
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(sizeof(float) * 3));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, reinterpret_cast<void*>(sizeof(float) * 3));
     glEnableVertexAttribArray(1);
-    
+
+    unsigned int elementBufferObject;
+    glGenBuffers(1, &elementBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+    float textureMix = 0.0f;
     while (!glfwWindowShouldClose(window))
     {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+            textureMix += 0.05f;
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            textureMix -= 0.05f;
+        textureMix = Utility::Limit(textureMix, 0.0f, 1.0f);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        shaderProgram.set("TextureMix", textureMix);
+        glActiveTexture(GL_TEXTURE0);
+        containerTexture.bind();
+        glActiveTexture(GL_TEXTURE1);
+        awesomeFaceTexture.bind();
+
         glBindVertexArray(vertexArrayObject);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
