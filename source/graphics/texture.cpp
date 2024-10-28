@@ -36,6 +36,7 @@ void Graphics::Texture::load(const std::string& imageFilePath, int format, bool 
 {
     free();
     m_texture = LoadTexture(imageFilePath, format, verticalFlip);
+    setFiltering(GL_LINEAR);
 }
 
 void Graphics::Texture::bind() const
@@ -56,13 +57,13 @@ void Graphics::Texture::setFiltering(int mode)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
 }
 
-void Graphics::Texture::setWrap(int direction, int mode)
+void Graphics::Texture::setWrapping(int direction, int mode)
 {
     bind();
     glTexParameteri(GL_TEXTURE_2D, direction, mode);
 }
 
-void Graphics::Texture::setWrap(int mode)
+void Graphics::Texture::setWrapping(int mode)
 {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);

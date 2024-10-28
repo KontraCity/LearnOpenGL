@@ -10,6 +10,8 @@
 
 // Graphics libraries
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace kc {
 
@@ -81,6 +83,11 @@ namespace Graphics
         /// @param name Variable name
         /// @param value The value to set
         void set(const std::string& name, float value);
+
+        /// @brief Set uniform variable
+        /// @param name Variable name
+        /// @param value The value to set
+        void set(const std::string& name, glm::mat4 value);
     };
 }
 

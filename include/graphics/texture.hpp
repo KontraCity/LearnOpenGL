@@ -47,23 +47,23 @@ namespace Graphics
         /// @brief Bind this texture
         void bind() const;
 
-        /// @brief Set texture filtering for direction
+        /// @brief Set texture filtering mode for direction
         /// @param direction Filtering direction (GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, etc)
         /// @param mode The filtering mode to set (GL_NEAREST, GL_LINEAR, etc)
         void setFiltering(int direction, int mode);
 
-        /// @brief Set texture filtering for all directions
+        /// @brief Set texture filtering mode for all directions
         /// @param mode The filtering mode to set (GL_NEAREST, GL_LINEAR, etc)
         void setFiltering(int mode);
 
-        /// @brief Set texture wrap mode for direction
-        /// @param direction Wrap direction (GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, etc)
-        /// @param mode The wrap mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
-        void setWrap(int direction, int mode);
+        /// @brief Set texture wrapping mode for direction
+        /// @param direction Wrapping direction (GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, etc)
+        /// @param mode The wrapping mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
+        void setWrapping(int direction, int mode);
 
-        /// @brief Set texture wrap mode for all directions
-        /// @param mode The wrap mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
-        void setWrap(int mode);
+        /// @brief Set texture wrapping mode for all directions
+        /// @param mode The wrapping mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
+        void setWrapping(int mode);
     };
 }
 

@@ -9,6 +9,8 @@
 // Graphics libraries
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // External modules
 #include "external/stb_image.h"
@@ -128,12 +130,28 @@ static void Run()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
         shaderProgram.set("TextureMix", textureMix);
         glActiveTexture(GL_TEXTURE0);
         containerTexture.bind();
         glActiveTexture(GL_TEXTURE1);
         awesomeFaceTexture.bind();
+
+        float time = static_cast<float>(glfwGetTime());
+        float scale = (std::sin(time * M_PI) + 1.0f) / 2.0f;
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(scale * 0.7f, scale * 0.7f, scale * 0.7f));
+        shaderProgram.set("Transform", transform);
+
+        glBindVertexArray(vertexArrayObject);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, glm::radians(time * 90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        transform = glm::scale(transform, glm::vec3(0.7f, 0.7f, 0.7f));
+        shaderProgram.set("Transform", transform);
 
         glBindVertexArray(vertexArrayObject);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

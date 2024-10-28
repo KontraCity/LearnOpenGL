@@ -131,4 +131,10 @@ void Graphics::ShaderProgram::set(const std::string& name, float value)
     glUniform1f(location, value);
 }
 
+void Graphics::ShaderProgram::set(const std::string& name, glm::mat4 value)
+{
+    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
 } // namespace kc
