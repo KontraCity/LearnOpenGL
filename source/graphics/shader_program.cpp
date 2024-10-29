@@ -101,7 +101,7 @@ Graphics::ShaderProgram::~ShaderProgram()
 
 void Graphics::ShaderProgram::make(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath)
 {
-    free(); // avoid memory leaks if make() is called multiple times
+    free(); // avoid memory leaks if make() was called already
     m_vertexShader = CompileShader(ReadFile(vertexShaderFilePath).c_str(), GL_VERTEX_SHADER);
     m_fragmentShader = CompileShader(ReadFile(fragmentShaderFilePath).c_str(), GL_FRAGMENT_SHADER);
     m_shaderProgram = LinkShaderProgram(m_vertexShader, m_fragmentShader);

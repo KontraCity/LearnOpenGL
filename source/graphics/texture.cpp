@@ -34,7 +34,7 @@ Graphics::Texture::~Texture()
 
 void Graphics::Texture::load(const std::string& imageFilePath, int format, bool verticalFlip)
 {
-    free();
+    free(); // avoid memory leaks if load() was called already
     m_texture = LoadTexture(imageFilePath, format, verticalFlip);
     setFiltering(GL_LINEAR);
 }

@@ -32,7 +32,6 @@ namespace Graphics
         void free();
 
     public:
-        /// @brief Initialize texture
         Texture();
 
         ~Texture();
