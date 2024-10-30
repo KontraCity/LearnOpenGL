@@ -21,7 +21,7 @@ namespace Graphics
     {
     private:
         /// @brief Read file
-        /// @param filePath File path
+        /// @param filePath Path to the file
         /// @throw std::runtime_error if file couldn't be opened
         /// @return File contents
         static std::string ReadFile(const std::string& filePath);
@@ -61,8 +61,8 @@ namespace Graphics
         ~ShaderProgram();
 
         /// @brief Read, compile shaders and link shader program
-        /// @param vertexShaderFilePath Vertex shader source file path
-        /// @param fragmentShaderFilePath Fragment shader source file path
+        /// @param vertexShaderFilePath Path to vertex shader source file
+        /// @param fragmentShaderFilePath Path to fragment shader source file
         /// @throw std::runtime_error if read/compile/link error occurs
         void make(const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath);
 

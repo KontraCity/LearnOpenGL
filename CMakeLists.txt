@@ -25,8 +25,10 @@ add_executable(LearnOpenGL "source/main.cpp"
     "source/external/stb_image.c"
 
     # Graphics modules
+    "source/graphics/camera.cpp"
     "source/graphics/shader_program.cpp"
     "source/graphics/texture.cpp"
+    "source/graphics/window.cpp"
 )
 target_link_libraries(LearnOpenGL PRIVATE
     fmt::fmt

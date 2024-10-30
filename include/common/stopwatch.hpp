@@ -25,7 +25,7 @@ public:
 
     /// @brief Get elapsed time in seconds
     /// @return Elapsed time in seconds
-    inline double seconds() const
+    inline float seconds() const
     {
         return milliseconds() / 1000.0;
     }

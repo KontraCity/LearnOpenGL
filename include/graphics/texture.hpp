@@ -18,7 +18,7 @@ namespace Graphics
     {
     private:
         /// @brief Load texture from image file
-        /// @param imageFilePath Image file path
+        /// @param imageFilePath Path to image file
         /// @param format Image format (GL_RGB, GL_RGBA, etc)
         /// @param verticalFlip Whether to flip texture vertically or not
         /// @throw std::runtime_error if texture couldn't be loaded
@@ -37,7 +37,7 @@ namespace Graphics
         ~Texture();
 
         /// @brief Load texture from image file
-        /// @param imageFilePath Image file path
+        /// @param imageFilePath Path to image file
         /// @param format Image format (GL_RGB, GL_RGBA, etc)
         /// @param verticalFlip Whether to flip texture vertically or not
         /// @throw std::runtime_error if texture couldn't be loaded

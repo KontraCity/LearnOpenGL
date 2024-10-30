@@ -21,7 +21,7 @@ private:
 
 public:
     /// @brief Open image file
-    /// @param imageFilePath Image file path
+    /// @param imageFilePath Path to image filee
     /// @param verticalFlip Whether to flip image vertically on load or not
     /// @throw std::runtime_error if image couldn't be opened
     Image(const std::string& imageFilePath, bool verticalFlip = false);
