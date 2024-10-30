@@ -20,7 +20,7 @@ namespace Graphics
         namespace Speed
         {
             constexpr float Normal = 2.5f;
-            constexpr float Fast = 6.0f;
+            constexpr float Fast = 10.0f;
             constexpr float Slow = 1.0f;
         }
 
@@ -86,6 +86,12 @@ namespace Graphics
 
     public:
         Camera();
+
+        /// @brief Reset camera position
+        void resetPosition();
+
+        /// @brief Reset camera zoom
+        void resetZoom();
 
         /// @brief Tell camera that keyboard key was pressed
         /// @param key The key that was pressed

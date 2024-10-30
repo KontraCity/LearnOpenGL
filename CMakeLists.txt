@@ -29,6 +29,10 @@ add_executable(LearnOpenGL "source/main.cpp"
     "source/graphics/shader_program.cpp"
     "source/graphics/texture.cpp"
     "source/graphics/window.cpp"
+
+    # Graphics mesh modules
+    "source/graphics/mesh/cube.cpp"
+    "source/graphics/mesh/mesh.cpp"
 )
 target_link_libraries(LearnOpenGL PRIVATE
     fmt::fmt

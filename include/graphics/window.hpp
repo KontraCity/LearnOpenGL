@@ -24,6 +24,9 @@
 #include "graphics/shader_program.hpp"
 #include "graphics/texture.hpp"
 
+// Custom graphics mesh modules
+#include "graphics/mesh/cube.hpp"
+
 namespace kc {
 
 namespace Graphics
@@ -36,6 +39,14 @@ namespace Graphics
         /// @param width New width
         /// @param height New height
         static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
+
+        /// @brief GLFW key event callback
+        /// @param window The window that received the event
+        /// @param key The key event is associated with
+        /// @param scancode OS specific key scancode
+        /// @param action Key action (press/repeat/release)
+        /// @param mods Bit field describing which modifier keys were held down
+        static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
         /// @brief GLFW mouse cursor position event callback
         /// @param window The window that received the event
@@ -60,6 +71,7 @@ namespace Graphics
         ShaderProgram m_shaderProgram;
         Texture m_containerTexture;
         Texture m_awesomeFaceTexture;
+        Mesh::Cube m_cube;
 
         /* Variables */
         float m_deltaTime;
@@ -69,6 +81,9 @@ namespace Graphics
     private:
         /// @brief Process keyboard input for current frame
         void processInput();
+
+        /// @brief Toggle wireframe rendering mode
+        void toggleWireframe();
 
     public:
         /// @brief Create window and prepare for rendering

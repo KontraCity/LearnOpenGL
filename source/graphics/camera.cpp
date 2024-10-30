@@ -18,21 +18,29 @@ float Graphics::Camera::MovementModeToSpeed(MovementMode mode)
 }
 
 Graphics::Camera::Camera()
-    : m_position(0.0f, 0.0f, 3.0f)
-    , m_front(0.0f, 0.0f, -1.0f)
-    , m_up(0.0f, 1.0f, 0.0f)
-    , m_yaw(-90.0f)
-    , m_pitch(0.0f)
-    , m_zoom(1.0f)
-{}
+{
+    resetPosition();
+}
+
+void Graphics::Camera::resetPosition()
+{
+    m_position = glm::vec3(0.0f, 0.0f, 3.0f);
+    m_front = glm::vec3(0.0f, 0.0f, -1.0f);
+    m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_yaw = -90.0f;
+    m_pitch = 0.0f;
+    m_zoom = 1.0f;
+}
+
+void Graphics::Camera::resetZoom()
+{
+    m_zoom = 1.0f;
+}
 
 void Graphics::Camera::keyPressed(Key key, MovementMode movementMode, float deltaTime)
 {
     switch (key)
     {
-        case Key::ZoomReset:
-            m_zoom = 1.0f;
-            break;
         case Key::Up:
             m_position.y += MovementModeToSpeed(movementMode) * deltaTime;
             break;

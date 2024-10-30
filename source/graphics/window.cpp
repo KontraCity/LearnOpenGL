@@ -10,6 +10,28 @@ void Graphics::Window::FrameBufferSizeCallback(GLFWwindow* window, int width, in
     glViewport(0, 0, width, height);
 }
 
+void Graphics::Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    Window* root = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    switch (key)
+    {
+        case GLFW_KEY_TAB:
+        {
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                root->toggleWireframe();
+            break;
+        }
+        case GLFW_KEY_R:
+        {
+            if (action == GLFW_PRESS)
+                root->m_camera.resetZoom();
+            else if (action == GLFW_REPEAT)
+                root->m_camera.resetPosition();
+            break;
+        }
+    }
+}
+
 void Graphics::Window::CursorPositionCallback(GLFWwindow* window, double x, double y)
 {
     static float lastX = x, lastY = y;
@@ -39,9 +61,7 @@ void Graphics::Window::processInput()
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         movementMode = Camera::MovementMode::Slow;
 
-    /* Camera control */
-    if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
-        m_camera.keyPressed(Camera::Key::ZoomReset, movementMode, m_deltaTime);
+    /* Camera movement */
     if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
         m_camera.keyPressed(Camera::Key::Up, movementMode, m_deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
@@ -61,6 +81,13 @@ void Graphics::Window::processInput()
         m_textureMix = Utility::Limit(m_textureMix + MixSpeed, MinMix, MaxMix);
     if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
         m_textureMix = Utility::Limit(m_textureMix - MixSpeed, MinMix, MaxMix);
+}
+
+void Graphics::Window::toggleWireframe()
+{
+    static bool wireframe = false;
+    wireframe = !wireframe;
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 }
 
 Graphics::Window::Window(unsigned int width, unsigned int height, const std::string& resourcesDirectoryPath)
@@ -99,6 +126,7 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     glViewport(0, 0, m_width, m_height);
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, &Window::FrameBufferSizeCallback);
+    glfwSetKeyCallback(m_window, &Window::KeyCallback);
     glfwSetCursorPosCallback(m_window, &Window::CursorPositionCallback);
     glfwSetScrollCallback(m_window, &Window::ScrollCallback);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -123,6 +151,7 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     m_shaderProgram.use();
     m_shaderProgram.set("ContainerTexture", 0);
     m_shaderProgram.set("AwesomeFaceTexture", 1);
+    m_cube.create();
 
     glActiveTexture(GL_TEXTURE0);
     m_containerTexture.bind();
@@ -137,66 +166,9 @@ Graphics::Window::~Window()
 
 void Graphics::Window::run()
 {
-    constexpr float Vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    unsigned int vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
-
-    unsigned int vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
-
     while (!glfwWindowShouldClose(m_window))
     {
-        float currentFrameTime = static_cast<float>(glfwGetTime());
+        float currentFrameTime = glfwGetTime();
         m_deltaTime = currentFrameTime - m_lastFrameTime;
         m_lastFrameTime = currentFrameTime;
 
@@ -205,14 +177,18 @@ void Graphics::Window::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_shaderProgram.set("TextureMix", m_textureMix);
 
-        glm::mat4 model(1.0f);
-        model = glm::rotate(model, currentFrameTime * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        // Left cube
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(-0.8f, 0.0f, 0.0f));
+        model = glm::rotate(model, currentFrameTime * glm::radians(-20.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         m_shaderProgram.set("Model", model);
+        m_cube.draw();
+
+        // Right cube
+        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.8f, 0.0f, 0.0f));
+        m_shaderProgram.set("Model", model);
+        m_cube.draw();
+
         m_camera.capture(m_shaderProgram, m_width, m_height);
-
-        glBindVertexArray(vertexArrayObject);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
