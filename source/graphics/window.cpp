@@ -74,13 +74,6 @@ void Graphics::Window::processInput()
         m_camera.keyPressed(Camera::Key::Left, movementMode, m_deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
         m_camera.keyPressed(Camera::Key::Right, movementMode, m_deltaTime);
-
-    /* Texture mix */
-    constexpr float MixSpeed = 0.05f, MinMix = 0.0f, MaxMix = 1.0f;
-    if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
-        m_textureMix = Utility::Limit(m_textureMix + MixSpeed, MinMix, MaxMix);
-    if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        m_textureMix = Utility::Limit(m_textureMix - MixSpeed, MinMix, MaxMix);
 }
 
 void Graphics::Window::toggleWireframe()
@@ -90,13 +83,12 @@ void Graphics::Window::toggleWireframe()
     glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 }
 
-Graphics::Window::Window(unsigned int width, unsigned int height, const std::string& resourcesDirectoryPath)
+Graphics::Window::Window(unsigned int width, unsigned int height, const std::string& resourcesPath)
     : m_window(nullptr)
     , m_width(static_cast<int>(width))
     , m_height(static_cast<int>(height))
     , m_deltaTime(0.0f)
     , m_lastFrameTime(0.0f)
-    , m_textureMix(0.0f)
 {
     if (glfwInit() != GLFW_TRUE)
         throw std::runtime_error("kc::Graphics::Window::Window(): Couldn't initialize GLFW");
@@ -134,13 +126,9 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     try
     {
         Stopwatch stopwatch;
-        m_shaderProgram.make(resourcesDirectoryPath + "/shaders/shader.vert", resourcesDirectoryPath + "/shaders/shader.frag");
-        fmt::print("Shader program built [{} ms]\n", stopwatch.milliseconds());
-
-        stopwatch.reset();
-        m_containerTexture.load(resourcesDirectoryPath + "/textures/container.jpg");
-        m_awesomeFaceTexture.load(resourcesDirectoryPath + "/textures/awesomeface.png", GL_RGBA, true);
-        fmt::print("Textures loaded [{} ms]\n", stopwatch.milliseconds());
+        m_shaderProgram.make(resourcesPath + "/shaders/normal.vert", resourcesPath + "/shaders/normal.frag");
+        m_lightShaderProgram.make(resourcesPath + "/shaders/normal.vert", resourcesPath + "/shaders/light.frag");
+        fmt::print("Shader programs built [{} ms]\n", stopwatch.milliseconds());
     }
     catch (...)
     {
@@ -149,14 +137,10 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     }
 
     m_shaderProgram.use();
-    m_shaderProgram.set("ContainerTexture", 0);
-    m_shaderProgram.set("AwesomeFaceTexture", 1);
+    m_shaderProgram.set("LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    m_shaderProgram.set("ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
     m_cube.create();
-
-    glActiveTexture(GL_TEXTURE0);
-    m_containerTexture.bind();
-    glActiveTexture(GL_TEXTURE1);
-    m_awesomeFaceTexture.bind();
+    m_lightCube.create();
 }
 
 Graphics::Window::~Window()
@@ -175,20 +159,23 @@ void Graphics::Window::run()
         processInput();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_shaderProgram.set("TextureMix", m_textureMix);
 
-        // Left cube
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(-0.8f, 0.0f, 0.0f));
-        model = glm::rotate(model, currentFrameTime * glm::radians(-20.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        m_shaderProgram.set("Model", model);
+        // Cube
+        m_shaderProgram.use();
+        m_shaderProgram.set("Model", glm::mat4(1.0f));
         m_cube.draw();
 
-        // Right cube
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.8f, 0.0f, 0.0f));
-        m_shaderProgram.set("Model", model);
-        m_cube.draw();
+        // Light cube model
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(1.2f, 1.0f, -2.0f));
+        model = glm::scale(model, glm::vec3(0.2f));
 
-        m_camera.capture(m_shaderProgram, m_width, m_height);
+        // Light cube
+        m_lightShaderProgram.use();
+        m_lightShaderProgram.set("Model", model);
+        m_lightCube.draw();
+        
+        m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }

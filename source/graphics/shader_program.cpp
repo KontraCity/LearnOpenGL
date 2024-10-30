@@ -131,6 +131,12 @@ void Graphics::ShaderProgram::set(const std::string& name, float value)
     glUniform1f(location, value);
 }
 
+void Graphics::ShaderProgram::set(const std::string& name, glm::vec3 value)
+{
+    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
+    glUniform3fv(location, 1, glm::value_ptr(value));
+}
+
 void Graphics::ShaderProgram::set(const std::string& name, glm::mat4 value)
 {
     int location = glGetUniformLocation(m_shaderProgram, name.c_str());

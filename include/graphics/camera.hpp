@@ -2,6 +2,7 @@
 
 // STL modules
 #include <cmath>
+#include <vector>
 
 // Graphics libraries
 #include <glm/glm.hpp>
@@ -108,11 +109,11 @@ namespace Graphics
         /// @param offset Scroll offset
         void mouseScrolled(int offset);
 
-        /// @brief Apply camera calculations to shader program
-        /// @param shaderProgram The shader program to apply to
+        /// @brief Apply camera calculations to shader programs
+        /// @param shaderPrograms Shader programs to apply calculations to
         /// @param width Window width
         /// @param height Window height
-        void capture(ShaderProgram& shaderProgram, unsigned int width, unsigned int height);
+        void capture(const std::vector<std::reference_wrapper<ShaderProgram>>& shaderPrograms, unsigned int width, unsigned int height);
     };
 }
 

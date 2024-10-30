@@ -87,6 +87,11 @@ namespace Graphics
         /// @brief Set uniform variable
         /// @param name Variable name
         /// @param value The value to set
+        void set(const std::string& name, glm::vec3 value);
+
+        /// @brief Set uniform variable
+        /// @param name Variable name
+        /// @param value The value to set
         void set(const std::string& name, glm::mat4 value);
     };
 }

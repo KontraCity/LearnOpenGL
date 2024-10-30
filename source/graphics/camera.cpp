@@ -73,7 +73,7 @@ void Graphics::Camera::mouseScrolled(int offset)
     m_zoom = Utility::Limit(m_zoom += offset * Sensivity::Scroll * m_zoom, Zoom::Min, Zoom::Max);
 }
 
-void Graphics::Camera::capture(ShaderProgram& shaderProgram, unsigned int width, unsigned int height)
+void Graphics::Camera::capture(const std::vector<std::reference_wrapper<ShaderProgram>>& shaderPrograms, unsigned int width, unsigned int height)
 {
     glm::vec3 direction(
         std::cos(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch)),
@@ -82,13 +82,16 @@ void Graphics::Camera::capture(ShaderProgram& shaderProgram, unsigned int width,
     );
     m_front = glm::normalize(direction);
 
-    glm::mat4 view(1.0f);
+    glm::mat4 view(1.0f), projection(1.0f);
     view = glm::lookAt(m_position, m_position + m_front, m_up);
-    shaderProgram.set("View", view);
-
-    glm::mat4 projection(1.0f);
     projection = glm::perspective(glm::radians(45.0f / m_zoom), static_cast<float>(width) / height, Perspective::Near, Perspective::Far);
-    shaderProgram.set("Projection", projection);
+
+    for (ShaderProgram& shaderProgram : shaderPrograms)
+    {
+        shaderProgram.use();
+        shaderProgram.set("View", view);
+        shaderProgram.set("Projection", projection);
+    }
 }
 
 } // namespace kc

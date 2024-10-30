@@ -22,7 +22,6 @@
 // Custom graphics modules
 #include "graphics/camera.hpp"
 #include "graphics/shader_program.hpp"
-#include "graphics/texture.hpp"
 
 // Custom graphics mesh modules
 #include "graphics/mesh/cube.hpp"
@@ -69,14 +68,13 @@ namespace Graphics
 
         /* Resources */
         ShaderProgram m_shaderProgram;
-        Texture m_containerTexture;
-        Texture m_awesomeFaceTexture;
+        ShaderProgram m_lightShaderProgram;
         Mesh::Cube m_cube;
+        Mesh::Cube m_lightCube;
 
         /* Variables */
         float m_deltaTime;
         float m_lastFrameTime;
-        float m_textureMix;
 
     private:
         /// @brief Process keyboard input for current frame
@@ -89,9 +87,9 @@ namespace Graphics
         /// @brief Create window and prepare for rendering
         /// @param width Window width
         /// @param height Window height
-        /// @param resourcesDirectoryPath Path to resources directory
+        /// @param resourcesPath Path to resources directory
         /// @throw std::runtime_error if internal error occurs
-        Window(unsigned int width, unsigned int height, const std::string& resourcesDirectoryPath);
+        Window(unsigned int width, unsigned int height, const std::string& resourcesPath);
 
         ~Window();
 
