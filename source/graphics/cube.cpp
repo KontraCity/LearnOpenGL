@@ -76,24 +76,17 @@ namespace Data
 }
 
 Graphics::Cube::Cube()
+    : Cube({}, {}, {})
+{}
+
+Graphics::Cube::Cube(const Transform& transform, Color color, const Material& material)
     : m_vertexArrayObject(0)
     , m_vertexBufferObject(0)
     , m_elementBufferObject(0)
-{}
-
-Graphics::Cube::~Cube()
+    , m_transform(transform)
+    , m_color(color)
+    , m_material(material)
 {
-    glDeleteBuffers(1, &m_elementBufferObject);
-    glDeleteBuffers(1, &m_vertexBufferObject);
-    glDeleteVertexArrays(1, &m_vertexArrayObject);
-}
-
-void Graphics::Cube::create(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
-{
-    m_position = position;
-    m_rotation = rotation;
-    m_scale = scale;
-
     glGenVertexArrays(1, &m_vertexArrayObject);
     glBindVertexArray(m_vertexArrayObject);
 
@@ -112,11 +105,30 @@ void Graphics::Cube::create(const glm::vec3& position, const glm::vec3& rotation
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Data::Indices), Data::Indices, GL_STATIC_DRAW);
 }
 
+Graphics::Cube::~Cube()
+{
+    glDeleteBuffers(1, &m_elementBufferObject);
+    glDeleteBuffers(1, &m_vertexBufferObject);
+    glDeleteVertexArrays(1, &m_vertexArrayObject);
+}
+
 void Graphics::Cube::draw(ShaderProgram& shaderProgram) const
 {
-    shaderProgram.use();
-    transform(shaderProgram);
+    // Transform
+    // TODO: Rotate model around a single axis rather than three
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, m_transform.position);
+    model = glm::rotate(model, glm::radians(m_transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(m_transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(m_transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, m_transform.scale);
+    shaderProgram.set("Model", model);
 
+    // Set color and material
+    shaderProgram.set("ObjectColor", m_color);
+    shaderProgram.set("Material", m_material);
+
+    // Draw
     glBindVertexArray(m_vertexArrayObject);
     glDrawElements(GL_TRIANGLES, sizeof(Data::Indices), GL_UNSIGNED_INT, 0);
 }

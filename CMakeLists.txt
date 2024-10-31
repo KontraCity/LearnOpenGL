@@ -27,8 +27,8 @@ add_executable(LearnOpenGL "source/main.cpp"
     # Graphics modules
     "source/graphics/camera.cpp"
     "source/graphics/cube.cpp"
+    "source/graphics/light.cpp"
     "source/graphics/shader_program.cpp"
-    "source/graphics/transform.cpp"
     "source/graphics/texture.cpp"
     "source/graphics/window.cpp"
 )

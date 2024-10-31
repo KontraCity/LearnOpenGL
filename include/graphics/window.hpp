@@ -22,6 +22,7 @@
 // Custom graphics modules
 #include "graphics/camera.hpp"
 #include "graphics/cube.hpp"
+#include "graphics/light.hpp"
 #include "graphics/shader_program.hpp"
 
 namespace kc {
@@ -67,12 +68,12 @@ namespace Graphics
         /* Resources */
         ShaderProgram m_shaderProgram;
         ShaderProgram m_lightShaderProgram;
-        Cube m_cube;
-        Cube m_lightCube;
 
         /* Variables */
+        float m_currentFrameTime;
         float m_deltaTime;
         float m_lastFrameTime;
+        bool m_lightAnimation;
 
     private:
         /// @brief Process keyboard input for current frame
@@ -80,6 +81,12 @@ namespace Graphics
 
         /// @brief Toggle wireframe rendering mode
         void toggleWireframe();
+
+        /// @brief Toggle VSync frame limiter
+        void toggleVSync();
+
+        /// @brief Show rendering FPS to console
+        void showFps();
 
     public:
         /// @brief Create window and prepare for rendering

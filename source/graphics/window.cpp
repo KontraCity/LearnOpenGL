@@ -15,10 +15,28 @@ void Graphics::Window::KeyCallback(GLFWwindow* window, int key, int scancode, in
     Window* root = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     switch (key)
     {
+        case GLFW_KEY_ESCAPE:
+        {
+            if (action == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, true);
+            break;
+        }
         case GLFW_KEY_TAB:
         {
             if (action == GLFW_PRESS || action == GLFW_REPEAT)
                 root->toggleWireframe();
+            break;
+        }
+        case GLFW_KEY_Q:
+        {
+            if (action == GLFW_PRESS)
+                root->toggleVSync();
+            break;
+        }
+        case GLFW_KEY_E:
+        {
+            if (action == GLFW_PRESS)
+                root->m_lightAnimation = !root->m_lightAnimation;
             break;
         }
         case GLFW_KEY_R:
@@ -50,10 +68,6 @@ void Graphics::Window::ScrollCallback(GLFWwindow* window, double xOffset, double
 
 void Graphics::Window::processInput()
 {
-    /* Window specific */
-    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(m_window, true);
-
     /* Camera movement mode */
     Camera::MovementMode movementMode = Camera::MovementMode::Normal;
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -83,12 +97,38 @@ void Graphics::Window::toggleWireframe()
     glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 }
 
+void Graphics::Window::toggleVSync()
+{
+    static bool enabled = true;
+    enabled = !enabled;
+    glfwSwapInterval(static_cast<int>(enabled));
+}
+
+void Graphics::Window::showFps()
+{
+    float fps = 1.0f / m_deltaTime;
+    static float min, max, resetTime = -1.0f;
+    if (resetTime == -1 || m_currentFrameTime - resetTime > 3.0f)
+    {
+        min = max = fps;
+        resetTime = m_currentFrameTime;
+    }
+
+    if (fps < min)
+        min = fps;
+    if (fps > max)
+        max = fps;
+    fmt::print("FPS: {:>6.1f} (min/max for 3s: {:>6.1f}, {:6.1f})\r", fps, min, max);
+}
+
 Graphics::Window::Window(unsigned int width, unsigned int height, const std::string& resourcesPath)
     : m_window(nullptr)
     , m_width(static_cast<int>(width))
     , m_height(static_cast<int>(height))
+    , m_currentFrameTime(0.0f)
     , m_deltaTime(0.0f)
     , m_lastFrameTime(0.0f)
+    , m_lightAnimation(true)
 {
     if (glfwInit() != GLFW_TRUE)
         throw std::runtime_error("kc::Graphics::Window::Window(): Couldn't initialize GLFW");
@@ -135,12 +175,6 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
         glfwTerminate();
         throw;
     }
-
-    m_shaderProgram.use();
-    m_shaderProgram.set("LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    m_shaderProgram.set("ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-    m_cube.create();
-    m_lightCube.create(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.0f), glm::vec3(0.2f));
 }
 
 Graphics::Window::~Window()
@@ -150,30 +184,50 @@ Graphics::Window::~Window()
 
 void Graphics::Window::run()
 {
+    Light light;
+    light.transform() = { glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
+    // light.properties() = { glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f) };
+
+    Cube goldCube;
+    goldCube.transform() = { glm::vec3(-0.6f, 0.0f, 0.6f) };
+    goldCube.material() = Materials::Gold;
+
+    Cube chromeCube;
+    chromeCube.transform() = { glm::vec3(0.6f, 0.0f, 0.6f) };
+    chromeCube.material() = Materials::Chrome;
+
+    Cube emeraldCube;
+    emeraldCube.transform() = { glm::vec3(0.0f, 0.0f, -0.6f) };
+    emeraldCube.material() = Materials::Emerald;
+
     while (!glfwWindowShouldClose(m_window))
     {
-        float currentFrameTime = glfwGetTime();
-        m_deltaTime = currentFrameTime - m_lastFrameTime;
-        m_lastFrameTime = currentFrameTime;
+        m_currentFrameTime = glfwGetTime();
+        m_deltaTime = m_currentFrameTime- m_lastFrameTime;
+        m_lastFrameTime = m_currentFrameTime;
+        showFps();
 
         processInput();
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Transform
-        m_lightCube.position().x = std::sin(currentFrameTime) * 1.5f;
-        m_lightCube.position().z = std::cos(currentFrameTime) * 1.5f;
-        m_shaderProgram.use();
-        m_shaderProgram.set("LightPosition", m_lightCube.position());
+        if (m_lightAnimation)
+            light.transform().position.x = light.transform().position.z = std::sin(m_currentFrameTime) * 1.5f;
+        else
+            light.transform().position = glm::vec3(0.0f, 1.0f, 0.0f);
 
         // Draw
-        m_cube.draw(m_shaderProgram);
-        m_lightCube.draw(m_lightShaderProgram);
+        light.draw(m_shaderProgram, m_lightShaderProgram);
+        goldCube.draw(m_shaderProgram);
+        chromeCube.draw(m_shaderProgram);
+        emeraldCube.draw(m_shaderProgram);
 
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
+    fmt::print("\nStopped\n");
 }
 
 } // namespace kc

@@ -85,7 +85,6 @@ void Graphics::Camera::capture(const std::vector<std::reference_wrapper<ShaderPr
     glm::mat4 view(1.0f), projection(1.0f);
     view = glm::lookAt(m_position, m_position + m_front, m_up);
     projection = glm::perspective(glm::radians(45.0f / m_zoom), static_cast<float>(width) / height, Perspective::Near, Perspective::Far);
-
     for (ShaderProgram& shaderProgram : shaderPrograms)
     {
         shaderProgram.use();

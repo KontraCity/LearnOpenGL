@@ -4,17 +4,17 @@ layout (location = 1) in vec3 aNormal;
 
 out vec3 FragPos;
 out vec3 Normal;
-out vec3 LightPos;
+out vec3 LightPosition;
 
-uniform mat4 Model;
-uniform mat4 View;
-uniform mat4 Projection;
-uniform vec3 LightPosition;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform vec3 uLightPosition;
 
 void main()
 {
-    gl_Position = Projection * View * Model * vec4(aPos, 1.0);
-    FragPos = vec3(View * Model * vec4(aPos, 1.0f));
-    Normal = mat3(transpose(inverse(View * Model))) * aNormal;
-    LightPos = vec3(View * vec4(LightPosition, 1.0f));
+    gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
+    FragPos = vec3(uView * uModel * vec4(aPos, 1.0f));
+    Normal = mat3(transpose(inverse(uView * uModel))) * aNormal;
+    LightPosition = vec3(uView * vec4(uLightPosition, 1.0f));
 }

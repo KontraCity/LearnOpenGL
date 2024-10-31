@@ -113,34 +113,52 @@ void Graphics::ShaderProgram::use() const
     glUseProgram(m_shaderProgram);
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, bool value)
+void Graphics::ShaderProgram::set(const std::string& name, bool boolean)
 {
-    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
-    glUniform1i(location, static_cast<int>(value));
+    use();
+    int location = glGetUniformLocation(m_shaderProgram, ('u' + name).c_str());
+    glUniform1i(location, static_cast<int>(boolean));
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, int value)
+void Graphics::ShaderProgram::set(const std::string& name, int integer)
 {
-    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
-    glUniform1i(location, value);
+    use();
+    int location = glGetUniformLocation(m_shaderProgram, ('u' + name).c_str());
+    glUniform1i(location, integer);
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, float value)
+void Graphics::ShaderProgram::set(const std::string& name, float real)
 {
-    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
-    glUniform1f(location, value);
+    use();
+    int location = glGetUniformLocation(m_shaderProgram, ('u' + name).c_str());
+    glUniform1f(location, real);
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, glm::vec3 value)
+void Graphics::ShaderProgram::set(const std::string& name, const glm::vec3& vector)
 {
-    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
-    glUniform3fv(location, 1, glm::value_ptr(value));
+    use();
+    int location = glGetUniformLocation(m_shaderProgram, ('u' + name).c_str());
+    glUniform3fv(location, 1, glm::value_ptr(vector));
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, glm::mat4 value)
+void Graphics::ShaderProgram::set(const std::string& name, const glm::mat4& matrix)
 {
-    int location = glGetUniformLocation(m_shaderProgram, name.c_str());
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    use();
+    int location = glGetUniformLocation(m_shaderProgram, ('u' + name).c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, Color color)
+{
+    set(name, glm::vec3(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f));
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, const Material& material)
+{
+    set(name + ".ambient", material.ambient);
+    set(name + ".diffuse", material.diffuse);
+    set(name + ".specular", material.specular);
+    set(name + ".shininess", material.shininess);
 }
 
 } // namespace kc

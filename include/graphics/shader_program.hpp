@@ -13,6 +13,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Custom modules
+#include "graphics/types/color.hpp"
+#include "graphics/types/material.hpp"
+
 namespace kc {
 
 namespace Graphics
@@ -69,30 +73,40 @@ namespace Graphics
         /// @brief Tell OpenGL to use this shader program
         void use() const;
 
-        /// @brief Set uniform variable
-        /// @param name Variable name
-        /// @param value The value to set
-        void set(const std::string& name, bool value);
+        /// @brief Set uniform boolean
+        /// @param name Boolean name
+        /// @param boolean The boolean to set
+        void set(const std::string& name, bool boolean);
 
-        /// @brief Set uniform variable
-        /// @param name Variable name
-        /// @param value The value to set
-        void set(const std::string& name, int value);
+        /// @brief Set uniform integer
+        /// @param name Integer name
+        /// @param integer The integer to set
+        void set(const std::string& name, int integer);
 
-        /// @brief Set uniform variable
-        /// @param name Variable name
-        /// @param value The value to set
-        void set(const std::string& name, float value);
+        /// @brief Set uniform real
+        /// @param name Real name
+        /// @param real The real to set
+        void set(const std::string& name, float real);
 
-        /// @brief Set uniform variable
-        /// @param name Variable name
-        /// @param value The value to set
-        void set(const std::string& name, glm::vec3 value);
+        /// @brief Set uniform vector
+        /// @param name Vector name
+        /// @param vector The vector to set
+        void set(const std::string& name, const glm::vec3& vector);
 
-        /// @brief Set uniform variable
-        /// @param name Variable name
-        /// @param value The value to set
-        void set(const std::string& name, glm::mat4 value);
+        /// @brief Set uniform matrix
+        /// @param name Matrix name
+        /// @param matrix The matrix to set
+        void set(const std::string& name, const glm::mat4& matrix);
+
+        /// @brief Set uniform color struct
+        /// @param name Color struct name
+        /// @param color The color struct to set
+        void set(const std::string& name, Color color);
+
+        /// @brief Set uniform material struct
+        /// @param name Material struct name
+        /// @param material The material struct to set
+        void set(const std::string& name, const Material& material);
     };
 }
 
