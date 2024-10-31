@@ -58,13 +58,13 @@ void Graphics::Window::processInput()
     Camera::MovementMode movementMode = Camera::MovementMode::Normal;
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         movementMode = Camera::MovementMode::Fast;
-    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
         movementMode = Camera::MovementMode::Slow;
 
     /* Camera movement */
-    if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
+    if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
         m_camera.keyPressed(Camera::Key::Up, movementMode, m_deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         m_camera.keyPressed(Camera::Key::Down, movementMode, m_deltaTime);
     if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
         m_camera.keyPressed(Camera::Key::Forward, movementMode, m_deltaTime);
@@ -126,8 +126,8 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     try
     {
         Stopwatch stopwatch;
-        m_shaderProgram.make(resourcesPath + "/shaders/normal.vert", resourcesPath + "/shaders/normal.frag");
-        m_lightShaderProgram.make(resourcesPath + "/shaders/normal.vert", resourcesPath + "/shaders/light.frag");
+        m_shaderProgram.make(resourcesPath + "/shaders/cube.vert", resourcesPath + "/shaders/cube.frag");
+        m_lightShaderProgram.make(resourcesPath + "/shaders/light.vert", resourcesPath + "/shaders/light.frag");
         fmt::print("Shader programs built [{} ms]\n", stopwatch.milliseconds());
     }
     catch (...)
@@ -140,7 +140,7 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     m_shaderProgram.set("LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     m_shaderProgram.set("ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
     m_cube.create();
-    m_lightCube.create();
+    m_lightCube.create(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.0f), glm::vec3(0.2f));
 }
 
 Graphics::Window::~Window()
@@ -157,24 +157,19 @@ void Graphics::Window::run()
         m_lastFrameTime = currentFrameTime;
 
         processInput();
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Cube
+        // Transform
+        m_lightCube.position().x = std::sin(currentFrameTime) * 1.5f;
+        m_lightCube.position().z = std::cos(currentFrameTime) * 1.5f;
         m_shaderProgram.use();
-        m_shaderProgram.set("Model", glm::mat4(1.0f));
-        m_cube.draw();
+        m_shaderProgram.set("LightPosition", m_lightCube.position());
 
-        // Light cube model
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(1.2f, 1.0f, -2.0f));
-        model = glm::scale(model, glm::vec3(0.2f));
+        // Draw
+        m_cube.draw(m_shaderProgram);
+        m_lightCube.draw(m_lightShaderProgram);
 
-        // Light cube
-        m_lightShaderProgram.use();
-        m_lightShaderProgram.set("Model", model);
-        m_lightCube.draw();
-        
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);
         glfwPollEvents();

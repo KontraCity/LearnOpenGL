@@ -21,10 +21,8 @@
 
 // Custom graphics modules
 #include "graphics/camera.hpp"
+#include "graphics/cube.hpp"
 #include "graphics/shader_program.hpp"
-
-// Custom graphics mesh modules
-#include "graphics/mesh/cube.hpp"
 
 namespace kc {
 
@@ -69,8 +67,8 @@ namespace Graphics
         /* Resources */
         ShaderProgram m_shaderProgram;
         ShaderProgram m_lightShaderProgram;
-        Mesh::Cube m_cube;
-        Mesh::Cube m_lightCube;
+        Cube m_cube;
+        Cube m_lightCube;
 
         /* Variables */
         float m_deltaTime;
