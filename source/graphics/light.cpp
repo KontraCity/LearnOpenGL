@@ -3,10 +3,10 @@
 namespace kc {
 
 Graphics::Light::Light()
-    : Light({}, {}, { glm::vec3(1.0f) })
+    : Light({}, {}, {})
 {}
 
-Graphics::Light::Light(const Transform& transform, Color color, const glm::vec3& properties)
+Graphics::Light::Light(const Transform& transform, Color color, const LightProperties& properties)
     : Cube(transform, color, {})
     , m_properties(properties)
 {}

@@ -63,6 +63,13 @@ namespace Graphics
         /// @brief Set texture wrapping mode for all directions
         /// @param mode The wrapping mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
         void setWrapping(int mode);
+
+        /// @brief Check if texture is loaded
+        /// @return True if texture is loaded
+        inline operator bool() const
+        {
+            return static_cast<bool>(m_texture);
+        }
     };
 }
 

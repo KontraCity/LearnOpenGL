@@ -24,6 +24,7 @@
 #include "graphics/cube.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shader_program.hpp"
+#include "graphics/texture.hpp"
 
 namespace kc {
 
@@ -60,6 +61,7 @@ namespace Graphics
 
     private:
         /* Window specific */
+        spdlog::logger m_logger;
         GLFWwindow* m_window;
         int m_width;
         int m_height;
@@ -68,6 +70,8 @@ namespace Graphics
         /* Resources */
         ShaderProgram m_shaderProgram;
         ShaderProgram m_lightShaderProgram;
+        Texture m_containerTexture;
+        Texture m_containerSpecularTexture;
 
         /* Variables */
         float m_currentFrameTime;

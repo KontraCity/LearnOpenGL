@@ -153,12 +153,25 @@ void Graphics::ShaderProgram::set(const std::string& name, Color color)
     set(name, glm::vec3(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f));
 }
 
+void Graphics::ShaderProgram::set(const std::string& name, const LightProperties& lightProperties)
+{
+    set(name + ".ambient", lightProperties.ambient);
+    set(name + ".diffuse", lightProperties.diffuse);
+    set(name + ".specular", lightProperties.specular);
+}
+
 void Graphics::ShaderProgram::set(const std::string& name, const Material& material)
 {
-    set(name + ".ambient", material.ambient);
-    set(name + ".diffuse", material.diffuse);
-    set(name + ".specular", material.specular);
+    set(name + ".diffuse", material.diffuse, 0);
+    set(name + ".specular", material.specular, 1);
     set(name + ".shininess", material.shininess);
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, const Texture& texture, int id)
+{
+    glActiveTexture(GL_TEXTURE0 + id);
+    texture.bind();
+    set(name, id);
 }
 
 } // namespace kc

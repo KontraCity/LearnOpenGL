@@ -15,7 +15,9 @@
 
 // Custom modules
 #include "graphics/types/color.hpp"
+#include "graphics/types/light_properties.hpp"
 #include "graphics/types/material.hpp"
+#include "graphics/texture.hpp"
 
 namespace kc {
 
@@ -103,10 +105,21 @@ namespace Graphics
         /// @param color The color struct to set
         void set(const std::string& name, Color color);
 
+        /// @brief Set uniform light properties struct
+        /// @param name Light properties struct name
+        /// @param lightProperties The light properties struct to set
+        void set(const std::string& name, const LightProperties& lightProperties);
+
         /// @brief Set uniform material struct
         /// @param name Material struct name
         /// @param material The material struct to set
         void set(const std::string& name, const Material& material);
+
+        /// @brief Set uniform texture
+        /// @param name Texture name
+        /// @param texture The texture to set
+        /// @param id Texture ID
+        void set(const std::string& name, const Texture& texture, int id);
     };
 }
 

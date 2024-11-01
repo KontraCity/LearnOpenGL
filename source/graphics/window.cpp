@@ -122,7 +122,8 @@ void Graphics::Window::showFps()
 }
 
 Graphics::Window::Window(unsigned int width, unsigned int height, const std::string& resourcesPath)
-    : m_window(nullptr)
+    : m_logger(Utility::CreateLogger("window"))
+    , m_window(nullptr)
     , m_width(static_cast<int>(width))
     , m_height(static_cast<int>(height))
     , m_currentFrameTime(0.0f)
@@ -168,7 +169,12 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
         Stopwatch stopwatch;
         m_shaderProgram.make(resourcesPath + "/shaders/cube.vert", resourcesPath + "/shaders/cube.frag");
         m_lightShaderProgram.make(resourcesPath + "/shaders/light.vert", resourcesPath + "/shaders/light.frag");
-        fmt::print("Shader programs built [{} ms]\n", stopwatch.milliseconds());
+        m_logger.info("Shader programs built [{} ms]", stopwatch.milliseconds());
+
+        stopwatch.reset();
+        m_containerTexture.load(resourcesPath + "/textures/container2.png", GL_RGBA, true);
+        m_containerSpecularTexture.load(resourcesPath + "/textures/container2_specular.png", GL_RGBA, true);
+        m_logger.info("Textures loaded [{} ms]", stopwatch.milliseconds());
     }
     catch (...)
     {
@@ -186,48 +192,44 @@ void Graphics::Window::run()
 {
     Light light;
     light.transform() = { glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
-    // light.properties() = { glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f) };
+    light.properties() = { 0.2f, 0.5f, 1.0f };
 
-    Cube goldCube;
-    goldCube.transform() = { glm::vec3(-0.6f, 0.0f, 0.6f) };
-    goldCube.material() = Materials::Gold;
-
-    Cube chromeCube;
-    chromeCube.transform() = { glm::vec3(0.6f, 0.0f, 0.6f) };
-    chromeCube.material() = Materials::Chrome;
-
-    Cube emeraldCube;
-    emeraldCube.transform() = { glm::vec3(0.0f, 0.0f, -0.6f) };
-    emeraldCube.material() = Materials::Emerald;
+    Cube cube;
+    cube.material().diffuse = m_containerTexture;
+    cube.material().specular = m_containerSpecularTexture;
+    cube.material().shininess = 64.0f;
 
     while (!glfwWindowShouldClose(m_window))
     {
         m_currentFrameTime = glfwGetTime();
-        m_deltaTime = m_currentFrameTime- m_lastFrameTime;
+        m_deltaTime = m_currentFrameTime - m_lastFrameTime;
         m_lastFrameTime = m_currentFrameTime;
         showFps();
 
         processInput();
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Transform
         if (m_lightAnimation)
-            light.transform().position.x = light.transform().position.z = std::sin(m_currentFrameTime) * 1.5f;
+        {
+            light.transform().position.x = std::sin(m_currentFrameTime) * 1.5f;
+            light.transform().position.z = std::cos(m_currentFrameTime) * 1.5f;
+        }
         else
-            light.transform().position = glm::vec3(0.0f, 1.0f, 0.0f);
+        {
+            light.transform().position = glm::vec3(1.5f, 1.0f, 1.5f);
+        }
 
         // Draw
         light.draw(m_shaderProgram, m_lightShaderProgram);
-        goldCube.draw(m_shaderProgram);
-        chromeCube.draw(m_shaderProgram);
-        emeraldCube.draw(m_shaderProgram);
+        cube.draw(m_shaderProgram);
 
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
-    fmt::print("\nStopped\n");
+    m_logger.info("{:<20}", "Stopped");
 }
 
 } // namespace kc

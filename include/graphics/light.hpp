@@ -1,6 +1,7 @@
 #pragma once
 
 // Custom modules
+#include "graphics/types/light_properties.hpp"
 #include "graphics/cube.hpp"
 
 namespace kc {
@@ -10,7 +11,7 @@ namespace Graphics
     class Light : public Cube
     {
     private:
-        glm::vec3 m_properties;
+        LightProperties m_properties;
 
     private:
         using Cube::draw;
@@ -23,7 +24,7 @@ namespace Graphics
         /// @param transform Light transform
         /// @parma color Light color
         /// @param properties Light properties
-        Light(const Transform& transform, Color color, const glm::vec3& properties);
+        Light(const Transform& transform, Color color, const LightProperties& properties);
 
         /// @brief Draw light to the screen
         /// @param shaderProgram Shader program to configure for lighting
@@ -32,14 +33,14 @@ namespace Graphics
 
         /// @brief Get light properties
         /// @return Light properties
-        inline const glm::vec3& properties() const
+        inline const LightProperties& properties() const
         {
             return m_properties;
         }
 
         /// @brief Get light properties
         /// @return Light properties
-        inline glm::vec3& properties()
+        inline LightProperties& properties()
         {
             return m_properties;
         }

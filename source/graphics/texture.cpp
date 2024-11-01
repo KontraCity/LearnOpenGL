@@ -11,6 +11,7 @@ unsigned int Graphics::Texture::LoadTexture(const std::string& imageFilePath, in
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, format, image.width(), image.height(), 0, format, GL_UNSIGNED_BYTE, image.data());
     glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
     return texture;
 }
 
@@ -48,6 +49,7 @@ void Graphics::Texture::setFiltering(int direction, int mode)
 {
     bind();
     glTexParameteri(GL_TEXTURE_2D, direction, mode);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Graphics::Texture::setFiltering(int mode)
@@ -55,12 +57,14 @@ void Graphics::Texture::setFiltering(int mode)
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Graphics::Texture::setWrapping(int direction, int mode)
 {
     bind();
     glTexParameteri(GL_TEXTURE_2D, direction, mode);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Graphics::Texture::setWrapping(int mode)
@@ -68,6 +72,7 @@ void Graphics::Texture::setWrapping(int mode)
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mode);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 } // namespace kc
