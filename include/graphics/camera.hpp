@@ -114,6 +114,20 @@ namespace Graphics
         /// @param width Window width
         /// @param height Window height
         void capture(const std::vector<std::reference_wrapper<ShaderProgram>>& shaderPrograms, unsigned int width, unsigned int height);
+
+        /// @brief Get camera position
+        /// @return Camera position
+        inline const glm::vec3& position() const
+        {
+            return m_position;
+        }
+
+        /// @brief Get camera direction
+        /// @return Camera direction
+        inline const glm::vec3& direction() const
+        {
+            return m_front;
+        }
     };
 }
 

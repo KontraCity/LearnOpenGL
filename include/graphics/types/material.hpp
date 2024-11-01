@@ -1,8 +1,5 @@
 #pragma once
 
-// Graphics libraries
-#include <glm/glm.hpp>
-
 // Custom modules
 #include "graphics/texture.hpp"
 

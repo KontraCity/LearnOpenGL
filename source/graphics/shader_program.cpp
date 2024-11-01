@@ -155,9 +155,17 @@ void Graphics::ShaderProgram::set(const std::string& name, Color color)
 
 void Graphics::ShaderProgram::set(const std::string& name, const LightProperties& lightProperties)
 {
+    // Properties
+    set(name + ".innerCutoff", glm::cos(glm::radians(lightProperties.innerCutoff)));
+    set(name + ".outerCutoff", glm::cos(glm::radians(lightProperties.outerCutoff)));
     set(name + ".ambient", lightProperties.ambient);
     set(name + ".diffuse", lightProperties.diffuse);
     set(name + ".specular", lightProperties.specular);
+
+    // Attenuation
+    set(name + ".attenuation.constant", lightProperties.attenuation.constant);
+    set(name + ".attenuation.linear", lightProperties.attenuation.linear);
+    set(name + ".attenuation.quadratic", lightProperties.attenuation.quadratic);
 }
 
 void Graphics::ShaderProgram::set(const std::string& name, const Material& material)

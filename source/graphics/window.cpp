@@ -35,8 +35,8 @@ void Graphics::Window::KeyCallback(GLFWwindow* window, int key, int scancode, in
         }
         case GLFW_KEY_E:
         {
-            if (action == GLFW_PRESS)
-                root->m_lightAnimation = !root->m_lightAnimation;
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                root->generateCubes();
             break;
         }
         case GLFW_KEY_R:
@@ -104,6 +104,19 @@ void Graphics::Window::toggleVSync()
     glfwSwapInterval(static_cast<int>(enabled));
 }
 
+void Graphics::Window::generateCubes()
+{
+    m_cubes.resize(10);
+    for (Cube& cube : m_cubes)
+    {
+        cube.transform().position = { Utility::Random(-3.0f, 3.0f), Utility::Random(-1.0f, 1.0f), Utility::Random(-10.0f, 0.0f) };
+        cube.transform().rotation = { Utility::Random(-90.0f, 90.0f), Utility::Random(-90.0f, 90.0f), Utility::Random(-90.0f, 90.0f) };
+        cube.material().diffuse = m_containerTexture;
+        cube.material().specular = m_containerSpecularTexture;
+        cube.material().shininess = 64.0f;
+    }
+}
+
 void Graphics::Window::showFps()
 {
     float fps = 1.0f / m_deltaTime;
@@ -129,7 +142,6 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     , m_currentFrameTime(0.0f)
     , m_deltaTime(0.0f)
     , m_lastFrameTime(0.0f)
-    , m_lightAnimation(true)
 {
     if (glfwInit() != GLFW_TRUE)
         throw std::runtime_error("kc::Graphics::Window::Window(): Couldn't initialize GLFW");
@@ -191,13 +203,9 @@ Graphics::Window::~Window()
 void Graphics::Window::run()
 {
     Light light;
-    light.transform() = { glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
-    light.properties() = { 0.2f, 0.5f, 1.0f };
-
-    Cube cube;
-    cube.material().diffuse = m_containerTexture;
-    cube.material().specular = m_containerSpecularTexture;
-    cube.material().shininess = 64.0f;
+    light.transform() = { glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
+    light.properties() = { 15.0f, 20.0f, 0.2f, 0.5f, 1.0f, { 0.2f } };
+    generateCubes();
 
     while (!glfwWindowShouldClose(m_window))
     {
@@ -207,29 +215,20 @@ void Graphics::Window::run()
         showFps();
 
         processInput();
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Transform
-        if (m_lightAnimation)
-        {
-            light.transform().position.x = std::sin(m_currentFrameTime) * 1.5f;
-            light.transform().position.z = std::cos(m_currentFrameTime) * 1.5f;
-        }
-        else
-        {
-            light.transform().position = glm::vec3(1.5f, 1.0f, 1.5f);
-        }
 
         // Draw
         light.draw(m_shaderProgram, m_lightShaderProgram);
-        cube.draw(m_shaderProgram);
+        light.transform().position.x = std::cos(m_currentFrameTime) * 3.0f;
+        for (const Cube& cube : m_cubes)
+            cube.draw(m_shaderProgram);
 
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
-    m_logger.info("{:<20}", "Stopped");
+    m_logger.warn("{:<20}", "Stopped");
 }
 
 } // namespace kc

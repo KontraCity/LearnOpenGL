@@ -77,7 +77,7 @@ namespace Graphics
         float m_currentFrameTime;
         float m_deltaTime;
         float m_lastFrameTime;
-        bool m_lightAnimation;
+        std::vector<Cube> m_cubes;
 
     private:
         /// @brief Process keyboard input for current frame
@@ -88,6 +88,9 @@ namespace Graphics
 
         /// @brief Toggle VSync frame limiter
         void toggleVSync();
+
+        /// @brief Generate cube positions
+        void generateCubes();
 
         /// @brief Show rendering FPS to console
         void showFps();

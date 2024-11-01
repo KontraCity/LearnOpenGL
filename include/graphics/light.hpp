@@ -12,6 +12,7 @@ namespace Graphics
     {
     private:
         LightProperties m_properties;
+        glm::vec3 m_direction;
 
     private:
         using Cube::draw;
@@ -43,6 +44,20 @@ namespace Graphics
         inline LightProperties& properties()
         {
             return m_properties;
+        }
+
+        /// @brief Get light direction
+        /// @return Light direction
+        inline const glm::vec3& direction() const
+        {
+            return m_direction;
+        }
+
+        /// @brief Get light direction
+        /// @return Light direction
+        inline glm::vec3& direction()
+        {
+            return m_direction;
         }
     };
 }
