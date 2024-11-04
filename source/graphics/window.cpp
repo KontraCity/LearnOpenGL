@@ -33,18 +33,18 @@ void Graphics::Window::KeyCallback(GLFWwindow* window, int key, int scancode, in
                 root->toggleVSync();
             break;
         }
-        case GLFW_KEY_E:
-        {
-            if (action == GLFW_PRESS || action == GLFW_REPEAT)
-                root->generateCubes();
-            break;
-        }
         case GLFW_KEY_R:
         {
             if (action == GLFW_PRESS)
                 root->m_camera.resetZoom();
             else if (action == GLFW_REPEAT)
                 root->m_camera.resetPosition();
+            break;
+        }
+        case GLFW_KEY_F:
+        {
+            if (action == GLFW_PRESS)
+                root->m_flashlight = !root->m_flashlight;
             break;
         }
     }
@@ -102,19 +102,6 @@ void Graphics::Window::toggleVSync()
     static bool enabled = true;
     enabled = !enabled;
     glfwSwapInterval(static_cast<int>(enabled));
-}
-
-void Graphics::Window::generateCubes()
-{
-    m_cubes.resize(10);
-    for (Cube& cube : m_cubes)
-    {
-        cube.transform().position = { Utility::Random(-3.0f, 3.0f), Utility::Random(-1.0f, 1.0f), Utility::Random(-10.0f, 0.0f) };
-        cube.transform().rotation = { Utility::Random(-90.0f, 90.0f), Utility::Random(-90.0f, 90.0f), Utility::Random(-90.0f, 90.0f) };
-        cube.material().diffuse = m_containerTexture;
-        cube.material().specular = m_containerSpecularTexture;
-        cube.material().shininess = 64.0f;
-    }
 }
 
 void Graphics::Window::showFps()
@@ -202,10 +189,22 @@ Graphics::Window::~Window()
 
 void Graphics::Window::run()
 {
-    Light light;
-    light.transform() = { glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
-    light.properties() = { 15.0f, 20.0f, 0.2f, 0.5f, 1.0f, { 0.2f } };
-    generateCubes();
+    Lighting::DirectionalLight directionalLight;
+    directionalLight.direction() = { -1.0f, -1.0f, -1.0f };
+
+    Lighting::PointLight pointLight;
+    pointLight.transform() = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
+
+    Lighting::SpotLight spotLight;
+    spotLight.transform().position = { 0.0f, 0.0f, 3.0f };
+    spotLight.transform().scale = { 0.2f, 0.2f, 0.2f };
+    spotLight.direction() = { 0.0f, 0.0f, -1.0f };
+
+    Cube cube;
+    cube.color() = { 255, 255, 255 };
+    cube.material().diffuse = m_containerTexture;
+    cube.material().specular = m_containerSpecularTexture;
+    cube.material().shininess = 32.0f;
 
     while (!glfwWindowShouldClose(m_window))
     {
@@ -218,11 +217,18 @@ void Graphics::Window::run()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Transform
+        pointLight.transform().position.x = std::sin(m_currentFrameTime);
+        pointLight.transform().position.z = std::cos(m_currentFrameTime);
+        spotLight.transform().position = m_camera.position() + m_camera.direction() * -0.1f;
+        spotLight.direction() = m_camera.direction();
+        spotLight.color() = m_flashlight ? Color{ 255, 255, 255 } : Color{ 0, 0, 0 };
+
         // Draw
-        light.draw(m_shaderProgram, m_lightShaderProgram);
-        light.transform().position.x = std::cos(m_currentFrameTime) * 3.0f;
-        for (const Cube& cube : m_cubes)
-            cube.draw(m_shaderProgram);
+        directionalLight.draw(m_shaderProgram, m_lightShaderProgram);
+        pointLight.draw(m_shaderProgram, m_lightShaderProgram);
+        spotLight.draw(m_shaderProgram, m_lightShaderProgram);
+        cube.draw(m_shaderProgram);
 
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);

@@ -12,12 +12,9 @@ namespace Graphics
 {
     struct LightProperties
     {
-        float innerCutoff = 15.0f;
-        float outerCutoff = 20.0f;
-        float ambient = 1.0f;
-        float diffuse = 1.0f;
+        float ambient = 0.2f;
+        float diffuse = 0.5f;
         float specular = 1.0f;
-        LightAttenuation attenuation;
     };
 }
 

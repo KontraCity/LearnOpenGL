@@ -15,6 +15,8 @@
 
 // Custom modules
 #include "graphics/types/color.hpp"
+#include "graphics/types/light_attenuation.hpp"
+#include "graphics/types/light_cutoff.hpp"
 #include "graphics/types/light_properties.hpp"
 #include "graphics/types/material.hpp"
 #include "graphics/texture.hpp"
@@ -105,10 +107,20 @@ namespace Graphics
         /// @param color The color struct to set
         void set(const std::string& name, Color color);
 
+        /// @brief Set uniform light attenuation struct
+        /// @param name Light attenuation struct name
+        /// @param attenuation The light attenuation struct to set
+        void set(const std::string& name, const LightAttenuation& attenuation);
+
+        /// @brief Set uniform light cutoff struct
+        /// @param name Light cutoff struct name
+        /// @param cutoff The light cutoff struct to set
+        void set(const std::string& name, const LightCutoff& cutoff);
+
         /// @brief Set uniform light properties struct
         /// @param name Light properties struct name
-        /// @param lightProperties The light properties struct to set
-        void set(const std::string& name, const LightProperties& lightProperties);
+        /// @param properties The light properties struct to set
+        void set(const std::string& name, const LightProperties& properties);
 
         /// @brief Set uniform material struct
         /// @param name Material struct name

@@ -27,10 +27,14 @@ add_executable(LearnOpenGL "source/main.cpp"
     # Graphics modules
     "source/graphics/camera.cpp"
     "source/graphics/cube.cpp"
-    "source/graphics/light.cpp"
     "source/graphics/shader_program.cpp"
     "source/graphics/texture.cpp"
     "source/graphics/window.cpp"
+    
+    # Graphics lighting modules
+    "source/graphics/lighting/directional_light.cpp"
+    "source/graphics/lighting/point_light.cpp"
+    "source/graphics/lighting/spot_light.cpp"
 )
 target_link_libraries(LearnOpenGL PRIVATE
     fmt::fmt

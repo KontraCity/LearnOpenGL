@@ -153,19 +153,24 @@ void Graphics::ShaderProgram::set(const std::string& name, Color color)
     set(name, glm::vec3(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f));
 }
 
-void Graphics::ShaderProgram::set(const std::string& name, const LightProperties& lightProperties)
+void Graphics::ShaderProgram::set(const std::string& name, const LightAttenuation& attenuation)
 {
-    // Properties
-    set(name + ".innerCutoff", glm::cos(glm::radians(lightProperties.innerCutoff)));
-    set(name + ".outerCutoff", glm::cos(glm::radians(lightProperties.outerCutoff)));
-    set(name + ".ambient", lightProperties.ambient);
-    set(name + ".diffuse", lightProperties.diffuse);
-    set(name + ".specular", lightProperties.specular);
+    set(name + ".constant", attenuation.constant);
+    set(name + ".linear", attenuation.linear);
+    set(name + ".quadratic", attenuation.quadratic);
+}
 
-    // Attenuation
-    set(name + ".attenuation.constant", lightProperties.attenuation.constant);
-    set(name + ".attenuation.linear", lightProperties.attenuation.linear);
-    set(name + ".attenuation.quadratic", lightProperties.attenuation.quadratic);
+void Graphics::ShaderProgram::set(const std::string& name, const LightCutoff& cutoff)
+{
+    set(name + ".inner", glm::cos(glm::radians(cutoff.inner)));
+    set(name + ".outer", glm::cos(glm::radians(cutoff.outer)));
+}
+
+void Graphics::ShaderProgram::set(const std::string& name, const LightProperties& properties)
+{
+    set(name + ".ambient", properties.ambient);
+    set(name + ".diffuse", properties.diffuse);
+    set(name + ".specular", properties.specular);
 }
 
 void Graphics::ShaderProgram::set(const std::string& name, const Material& material)

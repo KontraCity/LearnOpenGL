@@ -20,9 +20,11 @@
 #include "common/utility.hpp"
 
 // Custom graphics modules
+#include "graphics/lighting/directional_light.hpp"
+#include "graphics/lighting/point_light.hpp"
+#include "graphics/lighting/spot_light.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/cube.hpp"
-#include "graphics/light.hpp"
 #include "graphics/shader_program.hpp"
 #include "graphics/texture.hpp"
 
@@ -77,7 +79,7 @@ namespace Graphics
         float m_currentFrameTime;
         float m_deltaTime;
         float m_lastFrameTime;
-        std::vector<Cube> m_cubes;
+        bool m_flashlight;
 
     private:
         /// @brief Process keyboard input for current frame
@@ -88,9 +90,6 @@ namespace Graphics
 
         /// @brief Toggle VSync frame limiter
         void toggleVSync();
-
-        /// @brief Generate cube positions
-        void generateCubes();
 
         /// @brief Show rendering FPS to console
         void showFps();
