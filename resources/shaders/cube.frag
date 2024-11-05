@@ -105,7 +105,8 @@ vec3 CalcPointLight(PointLight light)
     float distanceToFrag = length(light.position - FragPos);
     float linear = light.attenuation.linear * distanceToFrag;
     float quadratic = light.attenuation.quadratic * (distanceToFrag * distanceToFrag);
-    float attenuation = 1.0f / (light.attenuation.constant + linear + quadratic);
+    float divider = light.attenuation.constant + linear + quadratic;
+    float attenuation = divider == 0.0f ? 0.0f : 1.0f / divider;
 
     vec3 result = ambient + diffuse + specular;
     return result * attenuation;
@@ -136,7 +137,8 @@ vec3 CalcSpotLight(SpotLight light)
     float distanceToFrag = length(light.position - FragPos);
     float linear = light.attenuation.linear * distanceToFrag;
     float quadratic = light.attenuation.quadratic * (distanceToFrag * distanceToFrag);
-    float attenuation = 1.0f / (light.attenuation.constant + linear + quadratic);
+    float divider = light.attenuation.constant + linear + quadratic;
+    float attenuation = divider == 0.0f ? 0.0f : 1.0f / divider;
 
     vec3 result = ambient + (diffuse + specular) * spotlight;
     return result * attenuation;

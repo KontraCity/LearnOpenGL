@@ -41,10 +41,28 @@ void Graphics::Window::KeyCallback(GLFWwindow* window, int key, int scancode, in
                 root->m_camera.resetPosition();
             break;
         }
+        case GLFW_KEY_1:
+        {
+            if (action == GLFW_PRESS)
+                root->m_directionalLightEnabled = !root->m_directionalLightEnabled;
+            break;
+        }
+        case GLFW_KEY_2:
+        {
+            if (action == GLFW_PRESS)
+                root->m_pointLightEnabled = !root->m_pointLightEnabled;
+            break;
+        }
         case GLFW_KEY_F:
         {
             if (action == GLFW_PRESS)
-                root->m_flashlight = !root->m_flashlight;
+                root->m_spotLightEnabled = !root->m_spotLightEnabled;
+            break;
+        }
+        case GLFW_KEY_G:
+        {
+            if (action == GLFW_PRESS)
+                root->m_spotLightAttached = !root->m_spotLightAttached;
             break;
         }
     }
@@ -129,6 +147,10 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
     , m_currentFrameTime(0.0f)
     , m_deltaTime(0.0f)
     , m_lastFrameTime(0.0f)
+    , m_directionalLightEnabled(false)
+    , m_pointLightEnabled(true)
+    , m_spotLightEnabled(false)
+    , m_spotLightAttached(true)
 {
     if (glfwInit() != GLFW_TRUE)
         throw std::runtime_error("kc::Graphics::Window::Window(): Couldn't initialize GLFW");
@@ -193,7 +215,7 @@ void Graphics::Window::run()
     directionalLight.direction() = { -1.0f, -1.0f, -1.0f };
 
     Lighting::PointLight pointLight;
-    pointLight.transform() = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
+    pointLight.transform() = { glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.2f) };
 
     Lighting::SpotLight spotLight;
     spotLight.transform().position = { 0.0f, 0.0f, 3.0f };
@@ -220,9 +242,15 @@ void Graphics::Window::run()
         // Transform
         pointLight.transform().position.x = std::sin(m_currentFrameTime);
         pointLight.transform().position.z = std::cos(m_currentFrameTime);
-        spotLight.transform().position = m_camera.position() + m_camera.direction() * -0.1f;
-        spotLight.direction() = m_camera.direction();
-        spotLight.color() = m_flashlight ? Color{ 255, 255, 255 } : Color{ 0, 0, 0 };
+        if (m_spotLightAttached)
+        {
+            spotLight.transform().position = m_camera.position() + m_camera.direction() * -0.3f;
+            spotLight.direction() = m_camera.direction();
+        }
+
+        directionalLight.color() = m_directionalLightEnabled ? Color{ 255, 255, 255 } : Color{ 0, 0, 0 };
+        pointLight.color() = m_pointLightEnabled ? Color{ 255, 255, 255 } : Color{ 0, 0, 0 };
+        spotLight.color() = m_spotLightEnabled ? Color{ 255, 255, 255 } : Color{ 0, 0, 0 };
 
         // Draw
         directionalLight.draw(m_shaderProgram, m_lightShaderProgram);

@@ -6,6 +6,15 @@ project(LearnOpenGL)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 include_directories("include/")
+add_link_options($<$<CONFIG:Debug>:/INCREMENTAL>)
+add_compile_options($<$<CONFIG:Debug>:/ZI>)
+
+## --- Windows specific compiler configuration --- ##
+if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
+    # Enable Hot Reload
+    add_compile_options($<$<CONFIG:Debug>:/ZI>)
+    add_link_options($<$<CONFIG:Debug>:/INCREMENTAL>)
+endif()
 
 ## --- Packages configuration --- ##
 find_package(fmt CONFIG REQUIRED)

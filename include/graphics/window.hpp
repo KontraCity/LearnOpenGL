@@ -79,7 +79,10 @@ namespace Graphics
         float m_currentFrameTime;
         float m_deltaTime;
         float m_lastFrameTime;
-        bool m_flashlight;
+        bool m_directionalLightEnabled;
+        bool m_pointLightEnabled;
+        bool m_spotLightEnabled;
+        bool m_spotLightAttached;
 
     private:
         /// @brief Process keyboard input for current frame
