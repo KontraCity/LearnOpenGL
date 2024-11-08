@@ -122,7 +122,7 @@ void Graphics::Window::toggleVSync()
     glfwSwapInterval(static_cast<int>(enabled));
 }
 
-void Graphics::Window::showFps()
+void Graphics::Window::showFps() const
 {
     float fps = 1.0f / m_deltaTime;
     static float min, max, resetTime = -1.0f;
@@ -193,9 +193,13 @@ Graphics::Window::Window(unsigned int width, unsigned int height, const std::str
         m_logger.info("Shader programs built [{} ms]", stopwatch.milliseconds());
 
         stopwatch.reset();
-        m_containerTexture.load(resourcesPath + "/textures/container2.png", GL_RGBA, true);
-        m_containerSpecularTexture.load(resourcesPath + "/textures/container2_specular.png", GL_RGBA, true);
+        m_containerTexture = std::make_shared<Texture>(Texture::Type::Diffuse, resourcesPath + "/textures/container2.png", GL_RGBA, true);
+        m_containerSpecularTexture = std::make_shared<Texture>(Texture::Type::Specular, resourcesPath + "/textures/container2_specular.png", GL_RGBA, true);
         m_logger.info("Textures loaded [{} ms]", stopwatch.milliseconds());
+
+        stopwatch.reset();
+        m_backpack.load(resourcesPath + "/models/backpack/backpack.obj");
+        m_logger.info("Models loaded [{} ms]", stopwatch.milliseconds());
     }
     catch (...)
     {
@@ -222,12 +226,6 @@ void Graphics::Window::run()
     spotLight.transform().scale = { 0.2f, 0.2f, 0.2f };
     spotLight.direction() = { 0.0f, 0.0f, -1.0f };
 
-    Cube cube;
-    cube.color() = { 255, 255, 255 };
-    cube.material().diffuse = m_containerTexture;
-    cube.material().specular = m_containerSpecularTexture;
-    cube.material().shininess = 32.0f;
-
     while (!glfwWindowShouldClose(m_window))
     {
         m_currentFrameTime = glfwGetTime();
@@ -240,8 +238,8 @@ void Graphics::Window::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Transform
-        pointLight.transform().position.x = std::sin(m_currentFrameTime);
-        pointLight.transform().position.z = std::cos(m_currentFrameTime);
+        pointLight.transform().position.x = std::sin(m_currentFrameTime) * 2.0f;
+        pointLight.transform().position.z = std::cos(m_currentFrameTime) * 2.0f;
         if (m_spotLightAttached)
         {
             spotLight.transform().position = m_camera.position() + m_camera.direction() * -0.3f;
@@ -256,7 +254,7 @@ void Graphics::Window::run()
         directionalLight.draw(m_shaderProgram, m_lightShaderProgram);
         pointLight.draw(m_shaderProgram, m_lightShaderProgram);
         spotLight.draw(m_shaderProgram, m_lightShaderProgram);
-        cube.draw(m_shaderProgram);
+        m_backpack.draw(m_shaderProgram);
 
         m_camera.capture({ m_shaderProgram, m_lightShaderProgram }, m_width, m_height);
         glfwSwapBuffers(m_window);

@@ -3,16 +3,14 @@ cmake_minimum_required(VERSION 3.20)
 project(LearnOpenGL)
 
 ## --- Compiler configuration --- ##
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 include_directories("include/")
-add_link_options($<$<CONFIG:Debug>:/INCREMENTAL>)
-add_compile_options($<$<CONFIG:Debug>:/ZI>)
 
 ## --- Windows specific compiler configuration --- ##
 if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
     # Enable Hot Reload
-    add_compile_options($<$<CONFIG:Debug>:/ZI>)
+    #add_compile_options($<$<CONFIG:Debug>:/ZI>)
     add_link_options($<$<CONFIG:Debug>:/INCREMENTAL>)
 endif()
 
@@ -23,6 +21,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 ## --- Executable configuration --- ##
 add_executable(LearnOpenGL "source/main.cpp"
@@ -36,6 +35,8 @@ add_executable(LearnOpenGL "source/main.cpp"
     # Graphics modules
     "source/graphics/camera.cpp"
     "source/graphics/cube.cpp"
+    "source/graphics/mesh.cpp"
+    "source/graphics/model.cpp"
     "source/graphics/shader_program.cpp"
     "source/graphics/texture.cpp"
     "source/graphics/window.cpp"
@@ -52,4 +53,5 @@ target_link_libraries(LearnOpenGL PRIVATE
     GLEW::GLEW
     ${OPENGL_LIBRARY}
     glm::glm
+    assimp::assimp
 )

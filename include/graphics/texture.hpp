@@ -2,6 +2,7 @@
 
 // STL modules
 #include <string>
+#include <memory>
 #include <stdexcept>
 
 // Graphics libraries
@@ -16,6 +17,16 @@ namespace Graphics
 {
     class Texture
     {
+    public:
+        using Pointer =  std::shared_ptr<Texture>;
+
+        enum class Type
+        {
+            None,
+            Diffuse,
+            Specular,
+        };
+
     private:
         /// @brief Load texture from image file
         /// @param imageFilePath Path to image file
@@ -26,22 +37,26 @@ namespace Graphics
 
     private:
         unsigned int m_texture;
+        Type m_type;
 
     private:
         /// @brief Free allocated resources
         void free();
 
     public:
-        Texture();
-
-        ~Texture();
-
         /// @brief Load texture from image file
+        /// @param type Texture type
         /// @param imageFilePath Path to image file
         /// @param format Image format (GL_RGB, GL_RGBA, etc)
         /// @param verticalFlip Whether to flip texture vertically or not
         /// @throw std::runtime_error if texture couldn't be loaded
-        void load(const std::string& imageFilePath, int format = GL_RGB, bool verticalFlip = false);
+        Texture(Type type, const std::string& imageFilePath, int format = GL_RGB, bool verticalFlip = false);
+
+        Texture(Texture&& other) noexcept;
+
+        Texture(const Texture& other) = delete;
+
+        ~Texture();
 
         /// @brief Bind this texture
         void bind() const;
@@ -64,11 +79,18 @@ namespace Graphics
         /// @param mode The wrapping mode to set (GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, etc)
         void setWrapping(int mode);
 
-        /// @brief Check if texture is loaded
-        /// @return True if texture is loaded
-        inline operator bool() const
+        /// @brief Get texture ID
+        /// @return Texture ID
+        inline int id() const
         {
-            return static_cast<bool>(m_texture);
+            return m_texture;
+        }
+
+        /// @brief Get texture type
+        /// @return Texture type
+        inline Type type() const
+        {
+            return m_type;
         }
     };
 }

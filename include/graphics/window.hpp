@@ -25,6 +25,7 @@
 #include "graphics/lighting/spot_light.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/cube.hpp"
+#include "graphics/model.hpp"
 #include "graphics/shader_program.hpp"
 #include "graphics/texture.hpp"
 
@@ -72,8 +73,9 @@ namespace Graphics
         /* Resources */
         ShaderProgram m_shaderProgram;
         ShaderProgram m_lightShaderProgram;
-        Texture m_containerTexture;
-        Texture m_containerSpecularTexture;
+        Texture::Pointer m_containerTexture;
+        Texture::Pointer m_containerSpecularTexture;
+        Model m_backpack;
 
         /* Variables */
         float m_currentFrameTime;
@@ -95,7 +97,7 @@ namespace Graphics
         void toggleVSync();
 
         /// @brief Show rendering FPS to console
-        void showFps();
+        void showFps() const;
 
     public:
         /// @brief Create window and prepare for rendering

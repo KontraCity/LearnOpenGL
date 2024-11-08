@@ -175,8 +175,10 @@ void Graphics::ShaderProgram::set(const std::string& name, const LightProperties
 
 void Graphics::ShaderProgram::set(const std::string& name, const Material& material)
 {
-    set(name + ".diffuse", material.diffuse, 0);
-    set(name + ".specular", material.specular, 1);
+    if (material.diffuse)
+        set(name + ".diffuse", *material.diffuse, 0);
+    if (material.specular)
+        set(name + ".specular", *material.specular, 1);
     set(name + ".shininess", material.shininess);
 }
 

@@ -9,8 +9,8 @@ namespace Graphics
 {
     struct Material
     {
-        Texture diffuse;
-        Texture specular;
+        Texture::Pointer diffuse;
+        Texture::Pointer specular;
         float shininess = 32.0f;
     };
 }

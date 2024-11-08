@@ -24,20 +24,24 @@ void Graphics::Texture::free()
     }
 }
 
-Graphics::Texture::Texture()
-    : m_texture(0)
-{}
+Graphics::Texture::Texture(Type type, const std::string& imageFilePath, int format, bool verticalFlip)
+    : m_texture(LoadTexture(imageFilePath, format, verticalFlip))
+    , m_type(type)
+{
+    setFiltering(GL_LINEAR);
+}
+
+Graphics::Texture::Texture(Texture&& other) noexcept
+    : m_texture(other.m_texture)
+    , m_type(other.m_type)
+{
+    other.m_texture = 0;
+    other.m_type = Type::None;
+}
 
 Graphics::Texture::~Texture()
 {
     free();
-}
-
-void Graphics::Texture::load(const std::string& imageFilePath, int format, bool verticalFlip)
-{
-    free(); // avoid memory leaks if load() was called already
-    m_texture = LoadTexture(imageFilePath, format, verticalFlip);
-    setFiltering(GL_LINEAR);
 }
 
 void Graphics::Texture::bind() const
